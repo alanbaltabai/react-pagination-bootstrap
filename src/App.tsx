@@ -35,7 +35,7 @@ function App() {
 		if (currentPage !== 1) setCurrentPage(currentPage - 1);
 	}
 
-	function changeCurrentPage(id: any) {
+	function changeCurrentPage(id: number) {
 		setCurrentPage(id);
 	}
 
