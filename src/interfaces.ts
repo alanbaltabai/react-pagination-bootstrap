@@ -1,6 +1,10 @@
-interface record {
+interface Record {
 	id: number;
-	name: string;
+	title: string;
 }
 
-export type { record };
+interface FetchedData {
+	products: Record[];
+}
+
+export type { Record, FetchedData };

@@ -1,46 +1,50 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { record } from './interfaces';
+import { Record, FetchedData } from './interfaces';
 
 function App() {
-	const [fetchedData, setFetchedData] = useState([]);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [recordsPerPage] = useState(5);
+	const [fetchedData, setFetchedData] = useState<Record[]>([]);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [recordsPerPage] = useState<number>(5);
+
+	const lastRecord: number = currentPage * recordsPerPage;
+	const firstRecord: number = lastRecord - recordsPerPage;
+	const currentRecords: Record[] = fetchedData.slice(firstRecord, lastRecord);
+	const totalCountOfPages = 6;
+	const pageNumbers: number[] = [...Array(totalCountOfPages + 1).keys()].slice(
+		1
+	); // [1, 2, ..., 6]
+	const recordParagraphs: JSX.Element[] = currentRecords.map((item: Record) => (
+		<p key={item.id}>
+			<span>{item.id}) </span>
+			{item.title}
+		</p>
+	));
 
 	useEffect(() => {
 		async function fetchMeds() {
-			const response = await fetch(
-				'https://medical.zhasapp.com/backend/products?searchJoin=and&with=shop&orderBy=updated_at&sortedBy=ASC&page=2&search=status:publish'
+			const response: Response = await fetch(
+				`https://dummyjson.com/products?limit=${recordsPerPage}&skip=${firstRecord}`
 			);
-			const data = await response.json();
-			setFetchedData(data.data);
+			const data: FetchedData = await response.json();
+			console.log(data);
+
+			setFetchedData(data.products);
 		}
 
 		fetchMeds();
-	}, []);
+	}, [firstRecord, recordsPerPage]);
 
-	const lastRecord = currentPage * recordsPerPage;
-	const firstRecord = lastRecord - recordsPerPage;
-	const currentRecords = fetchedData.slice(firstRecord, lastRecord);
-	const totalCountOfPages = Math.ceil(fetchedData.length / recordsPerPage);
-	const pageNumbers = [...Array(totalCountOfPages + 1).keys()].slice(1); // [1, 2, ...]
-	const recordParagraphs = currentRecords.map((item: record) => (
-		<p>
-			<span>{item.id}) </span>
-			{item.name}
-		</p>
-	));
+	function nextPage() {
+		if (currentPage !== totalCountOfPages) setCurrentPage(currentPage + 1);
+	}
 
 	function prevPage() {
 		if (currentPage !== 1) setCurrentPage(currentPage - 1);
 	}
 
-	function changeCurrentPage(id: number) {
-		setCurrentPage(id);
-	}
-
-	function nextPage() {
-		if (currentPage !== totalCountOfPages) setCurrentPage(currentPage + 1);
+	function changeCurrentPage(number: number) {
+		setCurrentPage(number);
 	}
 
 	return (
@@ -56,17 +60,17 @@ function App() {
 						</li>
 					)}
 
-					{pageNumbers.map((item, i) => (
+					{pageNumbers.map((number, i) => (
 						<li
-							className={`page-item ${currentPage === item ? 'active' : ''}`}
+							className={`page-item ${currentPage === number ? 'active' : ''}`}
 							key={i}
 						>
 							<a
 								href='#'
 								className='page-link'
-								onClick={() => changeCurrentPage(item)}
+								onClick={() => changeCurrentPage(number)}
 							>
-								{item}
+								{number}
 							</a>
 						</li>
 					))}
