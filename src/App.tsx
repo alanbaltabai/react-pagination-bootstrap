@@ -9,12 +9,11 @@ function App() {
 
 	const lastRecord: number = currentPage * recordsPerPage;
 	const firstRecord: number = lastRecord - recordsPerPage;
-	const currentRecords: Record[] = fetchedData.slice(firstRecord, lastRecord);
 	const totalCountOfPages = 6;
 	const pageNumbers: number[] = [...Array(totalCountOfPages + 1).keys()].slice(
 		1
 	); // [1, 2, ..., 6]
-	const recordParagraphs: JSX.Element[] = currentRecords.map((item: Record) => (
+	const recordParagraphs: JSX.Element[] = fetchedData.map((item: Record) => (
 		<p key={item.id}>
 			<span>{item.id}) </span>
 			{item.title}
@@ -27,7 +26,6 @@ function App() {
 				`https://dummyjson.com/products?limit=${recordsPerPage}&skip=${firstRecord}`
 			);
 			const data: FetchedData = await response.json();
-			console.log(data);
 
 			setFetchedData(data.products);
 		}
